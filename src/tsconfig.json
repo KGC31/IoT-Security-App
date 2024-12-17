@@ -1,0 +1,25 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [
+        "*"
+      ]
+    },
+    "jsx": "react-jsx", // Set JSX handling to react-jsx for React 17+ compatibility
+    "moduleResolution": "node", // Ensures TypeScript resolves modules correctly
+    "esModuleInterop": true, // Ensures compatibility with CommonJS and ES modules
+    "skipLibCheck": true, // Improves build performance by skipping library checks
+    "target": "ESNext", // Set target to ESNext (or your preferred JS version)
+    "module": "ESNext" // Use ESNext modules (or "CommonJS" if you need compatibility with Node.js)
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
+  ]
+}

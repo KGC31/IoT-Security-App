@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "750204581341",
+    "firebase_url": "https://iot-project-2da9a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "iot-project-2da9a",
+    "storage_bucket": "iot-project-2da9a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750204581341:android:79b9cdbb32faa5b4bdf234",
+        "android_client_info": {
+          "package_name": "com.kimnguyen.firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750204581341-ih8rljhbobb3fa64pnvg9s9aui4569ud.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBz8uWWaP6omYZGqt0wjHWHbiqMhU6LPL0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750204581341-ih8rljhbobb3fa64pnvg9s9aui4569ud.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "750204581341-pa601e1tuccb4aibcnn6n5bo39b0skub.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kimnguyen.firebase"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
