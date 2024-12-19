@@ -8,7 +8,7 @@ import { useAuth } from '~/hooks/useAuth';
 import { livestreamService } from '~/services/livestreamService';
 import { getListDeviceByUserId } from '~/services/deviceService';
 import { Dropdown } from 'react-native-element-dropdown';
-import { Skeleton } from '~/components/ui/skeleton'; // Assuming Skeleton is a custom component you already have
+import { Skeleton } from '~/components/ui/skeleton';
 
 interface Device {
     id: string;
@@ -43,7 +43,14 @@ export default function LivestreamComponent() {
         const fetchDevices = async () => {
             if (user) {
                 try {
-                    const listDevices = await getListDeviceByUserId(user.uid);
+                    const response = await getListDeviceByUserId(user.uid);
+
+                    if (response.has_error) {
+                        console.error('Error fetching devices:', response.error);
+                        return;
+                    }
+
+                    const listDevices = response.payload || [];
                     setDevices(listDevices);
 
                     // Set the first device as the default selected device if available
@@ -51,7 +58,7 @@ export default function LivestreamComponent() {
                         setSelectedDeviceId(listDevices[0].id);
                     }
                 } catch (error) {
-                    console.error('Error fetching devices:', error);
+                    console.error('Unexpected error fetching devices:', error);
                 }
             }
         };

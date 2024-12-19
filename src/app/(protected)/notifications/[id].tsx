@@ -7,8 +7,8 @@ import {
     ScrollView,
     TouchableOpacity,
 } from "react-native";
-import { MapPin, Cctv, ChevronLeft, Share2, Clock } from "lucide-react-native";
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { MapPin, Cctv, Clock } from "lucide-react-native";
+import { useRoute } from '@react-navigation/native';
 import { useAuth } from '~/hooks/useAuth';
 import { getNotificationDetailById } from '~/services/notificationServices';
 import { Timestamp } from "firebase/firestore";
@@ -20,7 +20,6 @@ export default function NotificationDetail() {
 
     const { user, loading } = useAuth();
     const route = useRoute();
-    const navigation = useNavigation();
     const notificationId = route.params?.id ?? "";
 
     useEffect(() => {

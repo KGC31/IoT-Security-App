@@ -11,11 +11,10 @@ export default function LoginScreen() {
     const handleLogin = async () => {
         try {
             const response = await signInService({ email, password });
-            if (response.success) {
+            if (!response.has_error) {
                 router.replace("/(protected)");
             } else {
-                console.error('Login failed: ', response.errorMessage);
-                // You can add a toast or alert for failure here
+                console.error('Login failed: ', response.error);
             }
         } catch (error) {
             console.error('Error during login:', error);

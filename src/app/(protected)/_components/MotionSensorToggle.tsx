@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Switch, View, Text, ActivityIndicator, Alert } from "react-native";
 import { Settings2 } from "lucide-react-native";
+import { getReadKey, getWriteKey } from "~/services/authServices";
+import { useAuth } from "~/hooks/useAuth";
 
 export default function MotionToggle() {
     const [isMotionEnabled, setIsMotionEnabled] = useState<boolean | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { user, loading } = useAuth();
 
     // Fetch the current value of field2 from ThingSpeak
     const fetchSensorStatus = async () => {
         setIsLoading(true);
         try {
+            const readKey = (await getReadKey(user?.uid || "")).payload;
             const response = await fetch(
-                'https://api.thingspeak.com/channels/2779475/fields/2.json?api_key=Z7W5RRPGEW0BVIBD&results=1'
+                `https://api.thingspeak.com/channels/2779475/fields/2.json?api_key=${readKey}&results=1`
             );
             const json = await response.json();
 
@@ -38,8 +42,10 @@ export default function MotionToggle() {
 
         while (attempt < maxRetries) {
             try {
+                const writeKey = (await getWriteKey(user?.uid || "")).payload;
+
                 const response = await fetch(
-                    `https://api.thingspeak.com/update?api_key=PTJ35MQNU5N8Z1RM&field2=${value ? 1 : 0}`
+                    `https://api.thingspeak.com/update?api_key=${writeKey}&field2=${value ? 1 : 0}`
                 );
 
                 if (response.ok) {
@@ -70,7 +76,7 @@ export default function MotionToggle() {
     // Fetch initial value on mount
     useEffect(() => {
         fetchSensorStatus();
-    }, []);
+    }, [user, loading]);
 
     return (
         <View className="flex-row justify-between items-center mb-6 bg-background">

@@ -1,5 +1,16 @@
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, User } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { app } from '~/firebase/firebaseConfig';
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Interface for the response data
+interface ResponseData<T = any> {
+  has_error: boolean;
+  payload: T | null;
+  error: string;
+}
 
 // Interface for the user signup data
 export interface UserSignupData {
@@ -7,17 +18,13 @@ export interface UserSignupData {
   password: string;
 }
 
-// Interface for the signup response
-export interface SignupResponse {
-  success: boolean;
-  user?: User; // Firebase User object
-  errorMessage?: string; // Error message, if any
+export interface UserLoginData {
+  email: string;
+  password: string;
 }
 
 // Signup service
-export const signUpService = async ({ email, password }: UserSignupData): Promise<SignupResponse> => {
-  const auth = getAuth(app);
-
+export const signUpService = async ({ email, password }: UserSignupData): Promise<ResponseData<string>> => {
   try {
     // Create a new user with email and password
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -26,8 +33,9 @@ export const signUpService = async ({ email, password }: UserSignupData): Promis
     console.log("User signed up successfully:", user.uid);
 
     return {
-      success: true,
-      user,
+      has_error: false,
+      payload: `User signed up successfully: ${user.uid}`,
+      error: "",
     };
   } catch (error: unknown) {
     // Safely handle errors
@@ -35,42 +43,24 @@ export const signUpService = async ({ email, password }: UserSignupData): Promis
     console.error(`Error signing up: ${firebaseError.code} - ${firebaseError.message}`);
 
     return {
-      success: false,
-      errorMessage: `Error signing up: ${firebaseError.code} - ${firebaseError.message}`,
+      has_error: true,
+      payload: null,
+      error: `Error signing up: ${firebaseError.code} - ${firebaseError.message}`,
     };
   }
 };
 
-// Interface for the user login data
-export interface UserLoginData {
-  email: string;
-  password: string;
-}
-
-// Interface for the sign-in response
-export interface SignInResponse {
-  success: boolean;
-  user?: User; // Firebase User object
-  token?: string; // ID token
-  errorMessage?: string; // Error message, if any
-}
-
 // Sign-in service
-export const signInService = async ({ email, password }: UserLoginData): Promise<SignInResponse> => {
-  const auth = getAuth(app);
-
+export const signInService = async ({ email, password }: UserLoginData): Promise<ResponseData<string>> => {
   try {
     // Sign in the user with email and password
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Get the ID token for the authenticated user
-    const token = await user.getIdToken();
-
     return {
-      success: true,
-      user,
-      token,
+      has_error: false,
+      payload: `User signed in successfully: ${user.uid}`,
+      error: "",
     };
   } catch (error: unknown) {
     // Safely handle errors
@@ -78,34 +68,116 @@ export const signInService = async ({ email, password }: UserLoginData): Promise
     console.error(`Error signing in: ${firebaseError.code} - ${firebaseError.message}`);
 
     return {
-      success: false,
-      errorMessage: `Error signing in: ${firebaseError.code} - ${firebaseError.message}`,
+      has_error: true,
+      payload: null,
+      error: `Error signing in: ${firebaseError.code} - ${firebaseError.message}`,
     };
   }
 };
 
-// Interface for the logout response
-export interface LogoutResponse {
-  success: boolean;
-  errorMessage?: string; // Error message, if any
-}
-
 // Logout service
-export const logoutService = async (): Promise<LogoutResponse> => {
-  const auth = getAuth(app);
-
+export const logoutService = async (): Promise<ResponseData<string>> => {
   try {
-    // Sign out the authenticated user
-    await signOut(auth);
-    console.log("User signed out successfully.");
-    return { success: true };
+    await auth.signOut();
+
+    return {
+      has_error: false,
+      payload: "User signed out successfully.",
+      error: "",
+    };
   } catch (error: unknown) {
     // Safely handle errors
     const firebaseError = error as { message: string };
     console.error(`Error signing out: ${firebaseError.message}`);
+
     return {
-      success: false,
-      errorMessage: `Error signing out: ${firebaseError.message}`,
+      has_error: true,
+      payload: null,
+      error: `Error signing out: ${firebaseError.message}`,
+    };
+  }
+};
+
+export const getReadKey = async (userId: string): Promise<ResponseData<string>> => {
+  try {
+    const userDocRef = doc(db, "users", userId); 
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      const readKey = data?.read_key;
+
+      if (readKey) {
+        return {
+          has_error: false,
+          payload: readKey,
+          error: "",
+        };
+      } else {
+        return {
+          has_error: true,
+          payload: null,
+          error: "Read key not found for this user.",
+        };
+      }
+    } else {
+      return {
+        has_error: true,
+        payload: null,
+        error: "User not found in Firestore.",
+      };
+    }
+  } catch (error: unknown) {
+    // Safely handle errors
+    const firebaseError = error as { message: string };
+    console.error(`Error fetching read key: ${firebaseError.message}`);
+
+    return {
+      has_error: true,
+      payload: null,
+      error: `Error fetching read key: ${firebaseError.message}`,
+    };
+  }
+};
+
+export const getWriteKey = async (userId: string): Promise<ResponseData<string>> => {
+  try {
+    const userDocRef = doc(db, "users", userId); 
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      const writeKey = data?.write_key;
+
+      if (writeKey) {
+        return {
+          has_error: false,
+          payload: writeKey,
+          error: "",
+        };
+      } else {
+        return {
+          has_error: true,
+          payload: null,
+          error: "Read key not found for this user.",
+        };
+      }
+    } else {
+      return {
+        has_error: true,
+        payload: null,
+        error: "User not found in Firestore.",
+      };
+    }
+  } catch (error: unknown) {
+    // Safely handle errors
+    const firebaseError = error as { message: string };
+    console.error(`Error fetching read key: ${firebaseError.message}`);
+
+    return {
+      has_error: true,
+      payload: null,
+      error: `Error fetching read key: ${firebaseError.message}`,
     };
   }
 };

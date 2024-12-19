@@ -30,14 +30,15 @@ export function useAuth(): AuthContextProps {
           const token = await currentUser.getIdToken();
           setAccessToken(token);
 
-          // Check if the token is valid (for example, checking expiration)
-          const tokenExpirationDate = await currentUser.getIdTokenResult().expirationTime;
+          // Get token details and expiration time
+          const tokenResult = await currentUser.getIdTokenResult();
+          const tokenExpirationTimestamp = new Date(tokenResult.expirationTime).getTime();
           const currentTime = Date.now();
-          setIsValidToken(currentTime < tokenExpirationDate);
 
+          setIsValidToken(currentTime < tokenExpirationTimestamp);
           setUser(currentUser);
-        } catch (err) {
-          setError("Failed to get the access token");
+        } catch (err: any) {
+          setError(err.message || "Failed to get the access token");
         }
       } else {
         // No user is signed in

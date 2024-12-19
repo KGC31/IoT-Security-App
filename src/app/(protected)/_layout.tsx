@@ -84,11 +84,11 @@ export default function RootLayout() {
     const handleLogout = async () => {
         try {
             const response = await logoutService();
-            if (response.success) {
+            if (!response.has_error) {
                 console.log('User logged out successfully');
                 router.replace('/sign-in'); // Redirect to sign-in page
             } else {
-                console.error(response.errorMessage);
+                console.error(response.error);
             }
         } catch (error) {
             console.error('Unexpected error during logout:', error);

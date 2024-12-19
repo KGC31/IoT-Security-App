@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View, Text } from "react-native";
 import { Bell } from "lucide-react-native";
+import { getWriteKey, getReadKey } from "~/services/authServices";
+import { useAuth } from "~/hooks/useAuth";
 
 export default function AlertButton() {
     const [isVisible, setIsVisible] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { user, loading } = useAuth();
 
     const fetchData = async () => {
         try {
+            const readKey = (await getReadKey(user?.uid || "")).payload;
+            
             const response = await fetch(
-                'https://api.thingspeak.com/channels/2779475/fields/1.json?api_key=Z7W5RRPGEW0BVIBD&results=1'
+                `https://api.thingspeak.com/channels/2779475/fields/1.json?api_key=${readKey}&results=1`
             );
             const json = await response.json();
 
@@ -40,15 +45,18 @@ export default function AlertButton() {
         const maxAttempts = 5;
 
         try {
+            const writeKey = (await getWriteKey(user?.uid || "")).payload;
+            const readKey = (await getReadKey(user?.uid || "")).payload;
+            
             while (attempts < maxAttempts) {
                 // Update the field to 0
                 await fetch(
-                    'https://api.thingspeak.com/update?api_key=PTJ35MQNU5N8Z1RM&field1=0'
+                    `https://api.thingspeak.com/update?api_key=${writeKey}&field1=0`
                 );
 
                 // Verify the field has been updated
                 const response = await fetch(
-                    'https://api.thingspeak.com/channels/2779475/fields/1.json?api_key=Z7W5RRPGEW0BVIBD&results=1'
+                    `https://api.thingspeak.com/channels/2779475/fields/1.json?api_key=${readKey}&results=1`
                 );
                 const json = await response.json();
 
@@ -82,7 +90,7 @@ export default function AlertButton() {
         return () => {
             clearInterval(intervalId); // Clear interval on unmount
         };
-    }, []);
+    }, [user, loading]);
 
     return (
         <>
