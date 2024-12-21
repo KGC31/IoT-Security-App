@@ -186,7 +186,6 @@ export const setReadNotification = async (userId: string, notificationId: string
 
       if (notificationDoc.exists()) {
         const result = await updateDoc(notificationRef, 'is_read', is_read)
-        console.log(result);
         return;
       }
     }

@@ -50,20 +50,22 @@ export default function NotificationsScreen() {
 
     const handleReadNotification = async (notification: NotificationData) => {
         try {
-            if (!notification.is_read) {
-                // Update the local state first
-                setNotifications((prevNotifications) =>
-                    prevNotifications.map((n) =>
-                        n.id === notification.id ? { ...n, is_read: true } : n
-                    )
-                );
-    
-                // Update the server-side state
-                await setReadNotification(user.uid, notification.id, true);
+            if (user) {
+                if (!notification.is_read) {
+                    // Update the local state first
+                    setNotifications((prevNotifications) =>
+                        prevNotifications.map((n) =>
+                            n.id === notification.id ? { ...n, is_read: true } : n
+                        )
+                    );
+        
+                    // Update the server-side state
+                    await setReadNotification(user.uid, notification.id, true);
+                }
+        
+                // Navigate to the notification's details page
+                router.push(`/notifications/${notification.id}`);
             }
-    
-            // Navigate to the notification's details page
-            router.push(`/notifications/${notification.id}`);
         } catch (error) {
             console.error('Error updating notification:', error);
         }

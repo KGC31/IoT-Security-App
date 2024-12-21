@@ -15,7 +15,6 @@ export const livestreamService = (userId: string, deviceId: string, callback: (b
             const snapshot = await get(deviceRef);
             if (snapshot.exists()) {
                 const deviceData = snapshot.val();
-                console.log(deviceData);
                 if (deviceData && deviceData.livestream) {
                     callback(deviceData.livestream);
                 }
@@ -32,7 +31,6 @@ export const livestreamService = (userId: string, deviceId: string, callback: (b
         onValue(deviceRef, (snapshot) => {
             if (snapshot.exists()) {
                 const deviceData = snapshot.val();
-                console.log(deviceData);
                 if (deviceData && deviceData.livestream) {
                     callback(deviceData.livestream);
                 }

@@ -3,9 +3,9 @@ import {
   ScrollView,
 } from 'react-native';
 import MotionToggle from '~/app/(protected)/_components/MotionSensorToggle';
-
 import LivestreamComponent from '~/app/(protected)/_components/Livestream';
 import LatestNotificationsComponent from '~/app/(protected)/_components/LatestNotifications';
+
 
 export default function HomeSecurityScreen() {
   return (
